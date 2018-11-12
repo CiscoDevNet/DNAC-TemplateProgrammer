@@ -36,7 +36,7 @@ def get_template_id(fqtn):
                     id = v['id']
     return id,max
 
-def execute(id, reqparams, device, params):
+def execute(id, reqparams, device, params, doForce):
     #parts = deviceParams.split(';')
     #device = parts[0]
 
@@ -46,6 +46,7 @@ def execute(id, reqparams, device, params):
     # need to check device params to make sure all present
     payload = {
     "templateId": id,
+    "forcePushTemplate" : doForce,
     "targetInfo": [
      {
 
@@ -64,6 +65,8 @@ if __name__ == "__main__":
                         help="tempate name (project/template")
     parser.add_argument('--device', type=str, required=False,
                         help="deviceIp  e.g 1.1.1.1")
+    parser.add_argument('--force', action="store_true", default = False,
+                        help="force template to be appliec")
     parser.add_argument('--params', type=str, required=False,
                         help="'{\"param1\" :\"v1\"}'")
 
@@ -88,7 +91,7 @@ if __name__ == "__main__":
         params = '{' + params + '}'
         print("\nRequired Parameters for template body:",params)
         if args.device:
-            response = execute(id, params, args.device, args.params)
+            response = execute(id, params, args.device, args.params, args.force)
             print ("\nResponse:")
             print (json.dumps(response, indent=2))
     else:
