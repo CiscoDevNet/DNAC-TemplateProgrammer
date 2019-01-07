@@ -49,10 +49,17 @@ def post_and_wait(url, data):
 
     # this has changed in 1.2 ##
     deploymentId = response.json()['deploymentId'].split(":")[-1].strip()
+
+    # look for the already deployed issue
     if "already deployed" in deploymentId:
         print("Error:", deploymentId)
         sys.exit(1)
-    taskId=deploymentId
+    applicable = response.json()['deploymentId'].split(":")[1].strip()
+
+    # look for device type issues
+    if 'nonApp' in applicable:
+        print("Error: {}".format(response.json()['deploymentId']))
+        sys.exit(1)
 
     print ("waiting for deploymentId", deploymentId)
 
