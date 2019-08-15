@@ -2,8 +2,11 @@
 These scripts demonstrate the template programmer API on Cisco DNA Center.
 The scripts assume the templates have been setup on Cisco DNA center in advance.
 
+The scripts are educational to illustrate the payload and API calls.
+
 ## Running the script
-The script needs a DNAC to communicate to via a config file (dnac_config.py) or environmnent variables.
+The script needs a DNAC to communicate to via a config file (dnac_config.py) or environmnent variables - 
+(DNAC, DNAC_USER, DNAC_PASSWORD).
 
 ## get a list of templates
 Run the script without argumnents to get a list of templates.
@@ -63,4 +66,28 @@ Looking for: Adam/int-vlan
 https://10.66.104.121:443/api/v1/template-programmer/template
 TemplateId: 78742a98-7a8b-435a-a2f8-284a1f940df0 Version: 9
 <SNIP>
+```
+
+## Bulk application
+I also started to work on the bulk application of a template to a set of devices.
+Use the --bulkfile option.  This is a csv file with a list of device_ip and variables for the given template
+
+The following is an exmaple where the template has two varaibles, "do" and "ip".  "device_ip" is fixed and the ip addreess of the target
+```buildoutcfg
+device_ip,do,ip
+10.10.15.100,1,10.10.10.250
+10.10.50.2,1,10.10.10.251
+```
+
+```buildoutcfg
+ ./template.py --template adam/simple --bulkfile work_files/test.csv
+Looking for: adam/simple
+https://10.66.104.121:443/dna/intent/api/v1/template-programmer/template
+TemplateId: d26cc12d-27f3-4fd2-97cd-63f32b85e889 Version: 2 
+<snip>
+
+Response:
+Deployment of template:adam/simple(v2) (id:e7301391-cc86-47ae-942d-ee625dde15ea)
+10.10.50.2:SUCCESS:Provisioning success for template simple
+10.10.15.100:SUCCESS:Provisioning success for template simple
 ```

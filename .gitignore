@@ -5,4 +5,8 @@ __pycache__/
 __init__.py
 *.pyc
 Examples
+archive.121
+archive_template.py
+newTemplate.save
+template.save
 
