@@ -32,6 +32,21 @@ def get_url(url):
         sys.exit(1)
 
     return response.json()
+def put(url, data):
+
+    token = get_auth_token()
+    url = create_url(path=url)
+    headers= { 'x-auth-token': token['token'], 'content-type' : 'application/json'}
+
+    try:
+        response = requests.put(url, headers=headers, data=json.dumps(data), verify=False)
+    except requests.exceptions.RequestException  as cerror:
+        print ("Error processing request", cerror)
+        sys.exit(1)
+
+    logging.debug("PUT Result{}".format(json.dumps(response.json())))
+
+    return response.json()
 
 def deploy_and_wait(url, data):
 

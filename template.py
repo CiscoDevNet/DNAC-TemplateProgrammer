@@ -7,7 +7,7 @@ import logging
 from argparse import ArgumentParser
 import csv
 from util import DeploymentError
-from util import get_url, deploy_and_wait, put_and_wait, post_and_wait
+from util import get_url, deploy_and_wait, put_and_wait, post_and_wait, put
 
 def show_templates():
     print("Available Templates:")
@@ -66,6 +66,20 @@ def execute(id, reqparams, bindings, device, params, doForce):
     print ("payload", json.dumps(payload))
     return deploy_and_wait("dna/intent/api/v1/template-programmer/template/deploy", payload)
 
+def preview_template(id, params):
+    print("Previewing template")
+    payload = {
+    "templateId": id,
+    "params": json.loads(params)
+    }
+    #print(json.dumps(payload))
+    response = put("dna/intent/api/v1/template-programmer/template/preview", payload)
+
+    if "cliPreview" in response:
+        print(response['cliPreview'])
+    else:
+        print(json.dumps(response,indent=2))
+
 def bulk(id, reqparams, bindings, bulkfile, doForce):
     targets = []
     with open(bulkfile, "rt") as f:
@@ -89,7 +103,10 @@ def bulk(id, reqparams, bindings, bulkfile, doForce):
 
 def print_template(template):
     print("Showing Template Body:")
-
+    print(template)
+    # wolverine hack
+    if 'response' in template:
+        template=template['response']
     print(template['templateContent'])
     params = ['"{0}":""'.format(p['parameterName']) for p in template['templateParams']
                                                     if p['binding'] == '']
@@ -160,6 +177,8 @@ if __name__ == "__main__":
                         help="update body of template.  Be careful of unix variable substution, use '<template body>'")
     parser.add_argument('--device', type=str, required=False,
                         help="deviceIp  e.g 1.1.1.1")
+    parser.add_argument('--preview', action="store_true", default=False,
+                        help="preview aa template")
     parser.add_argument('--force', action="store_true", default = False,
                         help="force template to be appliec")
     parser.add_argument('--params', type=str, required=False,
@@ -186,6 +205,8 @@ if __name__ == "__main__":
         params, bindings = print_template(template)
         if args.update:
             update_template(template, args.template, args.update)
+        if args.preview:
+            preview_template(id, args.params)
         if args.device:
             if args.paramsfile:
                 with open(args.paramsfile, "r") as f:
