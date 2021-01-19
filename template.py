@@ -100,6 +100,24 @@ def bulk(id, reqparams, bindings, bulkfile, doForce):
 
     return(deploy_and_wait("dna/intent/api/v1/template-programmer/template/deploy", payload))
 
+def paramsfiletojson (paramsfile):
+    params = {}
+    headers = []
+
+    with open(paramsfile, "rt") as f:
+        reader = csv.reader(f)
+        headers = [header.strip() for header in next(f).split(",")]
+        
+        for line in f:
+            values = [value.strip() for value in line.split(",")]
+            
+            for (header,value) in zip(headers,values):
+                if (header not in params):
+                    params[header] = [value]
+                else:
+                    params[header].append(value)
+
+    return (json.dumps(params))
 
 def print_template(template):
     print("Showing Template Body:")
@@ -205,13 +223,22 @@ if __name__ == "__main__":
         params, bindings = print_template(template)
         if args.update:
             update_template(template, args.template, args.update)
-        if args.preview:
-            preview_template(id, args.params)
+        
         if args.device:
             if args.paramsfile:
-                with open(args.paramsfile, "r") as f:
-                    print(args.paramsfile)
-                    inputParams = json.dumps(json.load(f))
+                if args.paramsfile.endswith('.json'):
+                    with open(args.paramsfile, "r") as f:
+                        print(args.paramsfile)
+                        inputParams = json.dumps(json.load(f))
+                elif args.paramsfile.endswith('.csv'):
+                    inputParams = paramsfiletojson(args.paramsfile)
+                else:
+                    print("Error reading paramsfile - expected <.csv|.json> in argument")
+                    sys.exit()
+
+                if args.preview:
+                    preview_template(id, inputParams)
+
             else:
                 inputParams = args.params
             response = execute(id, params, bindings, args.device, inputParams, args.force)
