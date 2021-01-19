@@ -91,3 +91,198 @@ Deployment of template:adam/simple(v2) (id:e7301391-cc86-47ae-942d-ee625dde15ea)
 10.10.50.2:SUCCESS:Provisioning success for template simple
 10.10.15.100:SUCCESS:Provisioning success for template simple
 ```
+
+## Bulk application - Variable Lists
+Sometimes it is necessary to supply series of values for a set of predefined variables in Jinja2 a template.
+We can have a '.csv' or a '.json' formatted source file that we can have the template iterate over for each of those variables.
+
+Sample 'paramsfile.csv':
+
+```buildoutcfg
+SITE_CODE,DESCRIPTION
+CAN01,CDN_SITE_01
+CAN02,CDN_SITE_02
+CAN03,CDN_SITE_03
+```
+
+And Jinja2 Template hosted on DNAC (you will find it in 'work_files' dir in .json format which you can import int DNAC, 'WLC9800-DayN-Provisioning' project for purposes of this example):
+
+```buildconfig
+{% SET SITE_CODE_LIST = SITE_CODE %}
+{% SET DESCRIPTION_LIST = DESCRIPTION %}
+
+{% FOR ITEM in SITE_CODE_LIST %}
+{% SET SITE = SITE_CODE_LIST[loop.index-1] %}
+{% SET DESCRIPTION = DESCRIPTION_LIST[loop.index-1] %}
+
+wireless profile flex FP_{{SITE}}
+ acl-policy CAPTIVE_PORTAL_REDIRECT
+  central-webauth
+ no arp-caching
+ no local-auth ap radius
+ native-vlan-id 2
+ vlan-name data
+  acl Flex_Profile_Allow_All
+  vlan-id 10
+ vlan-name byod
+  acl Flex_Profile_Allow_All
+  vlan-id 20
+ vlan-name guest
+  acl Flex_Profile_Allow_All
+  vlan-id 30
+
+wireless tag site ST_{{SITE}}
+ ap-profile MyApProfile
+ description {{DESCRIPTION}}
+ no local-site
+ flex-profile FP_{{SITE}}
+{% ENDFOR %}
+```
+
+J2 template above accepts two lists of variables, and creates a nested set of configlets for each row of values in the supplied '.csv' or '.json' paramsfile
+
+```buildconfig
+./template.py --template WLC9800-DayN-Provisioning/Guest-Wireless-Tag-Profile --device 10.85.54.99 --preview --force --paramsfile 'work_files/paramsfile.csv'
+```
+
+or
+
+```buildconfig
+./template.py --template WLC9800-DayN-Provisioning/Guest-Wireless-Tag-Profile --device 10.85.54.99 --preview --force --paramsfile 'work_files/paramsfile.json'
+```
+
+with output
+
+```buildconfig
+...
+{% SET SITE_CODE_LIST = SITE_CODE %}
+{% SET DESCRIPTION_LIST = DESCRIPTION %}
+
+{% FOR ITEM in SITE_CODE_LIST %}
+{% SET SITE = SITE_CODE_LIST[loop.index-1] %}
+{% SET DESCRIPTION = DESCRIPTION_LIST[loop.index-1] %}
+
+wireless profile flex FP_{{SITE}}
+ acl-policy CAPTIVE_PORTAL_REDIRECT
+  central-webauth
+ no arp-caching
+ no local-auth ap radius
+ native-vlan-id 2
+ vlan-name data
+  acl Flex_Profile_Allow_All
+  vlan-id 10
+ vlan-name byod
+  acl Flex_Profile_Allow_All
+  vlan-id 20
+ vlan-name guest
+  acl Flex_Profile_Allow_All
+  vlan-id 30
+
+wireless tag site ST_{{SITE}}
+ ap-profile MyApProfile
+ description {{DESCRIPTION}}
+ no local-site
+ flex-profile FP_{{SITE}}
+{% ENDFOR %}
+
+Required Parameters for template body: {"SITE_CODE":"","SITE":"","DESCRIPTION":""}
+
+Bindings []
+Previewing template
+
+
+wireless profile flex FP_CAN01
+ acl-policy CAPTIVE_PORTAL_REDIRECT
+  central-webauth
+ no arp-caching
+ no local-auth ap radius
+ native-vlan-id 2
+ vlan-name data
+  acl Flex_Profile_Allow_All
+  vlan-id 10
+ vlan-name byod
+  acl Flex_Profile_Allow_All
+  vlan-id 20
+ vlan-name guest
+  acl Flex_Profile_Allow_All
+  vlan-id 30
+
+wireless tag site ST_CAN01
+ ap-profile MyApProfile
+ description CDN_SITE_01
+ no local-site
+ flex-profile FP_CAN01
+
+wireless profile flex FP_CAN02
+ acl-policy CAPTIVE_PORTAL_REDIRECT
+  central-webauth
+ no arp-caching
+ no local-auth ap radius
+ native-vlan-id 2
+ vlan-name data
+  acl Flex_Profile_Allow_All
+  vlan-id 10
+ vlan-name byod
+  acl Flex_Profile_Allow_All
+  vlan-id 20
+ vlan-name guest
+  acl Flex_Profile_Allow_All
+  vlan-id 30
+
+wireless tag site ST_CAN02
+ ap-profile MyApProfile
+ description CDN_SITE_02
+ no local-site
+ flex-profile FP_CAN02
+
+wireless profile flex FP_CAN03
+ acl-policy CAPTIVE_PORTAL_REDIRECT
+  central-webauth
+ no arp-caching
+ no local-auth ap radius
+ native-vlan-id 2
+ vlan-name data
+  acl Flex_Profile_Allow_All
+  vlan-id 10
+ vlan-name byod
+  acl Flex_Profile_Allow_All
+  vlan-id 20
+ vlan-name guest
+  acl Flex_Profile_Allow_All
+  vlan-id 30
+
+wireless tag site ST_CAN03
+ ap-profile MyApProfile
+ description CDN_SITE_03
+ no local-site
+ flex-profile FP_CAN03
+
+
+Executing template on:10.85.54.99, with Params:{"SITE_CODE": ["CAN01", "CAN02", "CAN03"], "DESCRIPTION": ["CDN_SITE_01", "CDN_SITE_02", "CDN_SITE_03"]}
+...
+Response:
+{
+  "deploymentId": "458e81b1-7095-402b-b8cb-735119543e2c",
+  "templateName": "Guest-Wireless-Tag-Profile",
+  "templateVersion": "2",
+  "projectName": "WLC9800-DayN-Provisioning",
+  "status": "SUCCESS",
+  "startTime": "22:44:01 19/01/2021",
+  "endTime": "22:44:38 19/01/2021",
+  "duration": "0 minutes 36 seconds",
+  "devices": [
+    {
+      "deviceId": "b57b4ca1-4b7c-4e07-bafc-f60b4b6d163d",
+      "name": "",
+      "status": "SUCCESS",
+      "detailedStatusMessage": "Provisioning success for template Guest-Wireless-Tag-Profile",
+      "startTime": "22:44:01 19/01/2021",
+      "endTime": "22:44:38 19/01/2021",
+      "ipAddress": "b57b4ca1-4b7c-4e07-bafc-f60b4b6d163d",
+      "identifier": "b57b4ca1-4b7c-4e07-bafc-f60b4b6d163d",
+      "targetType": "MANAGED_DEVICE_IP",
+      "duration": "0 minutes 36 seconds"
+    }
+  ]
+}
+```

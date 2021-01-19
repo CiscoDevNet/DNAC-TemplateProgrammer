@@ -1,0 +1,171 @@
+[
+  {
+    "name": "Guest-Wireless-Tag-Profile",
+    "description": "Initial generation of wireless tag and profile elements which will be used in 'custom site tag' attribute of Branch Network Profile",
+    "tags": [
+      {
+        "id": "15911e2f-4626-4fcc-af83-0b30a4503dd4",
+        "name": "day_n_system_config"
+      }
+    ],
+    "deviceTypes": [
+      {
+        "productFamily": "Wireless Controller",
+        "productSeries": "Cisco Catalyst 9800 Series Wireless Controllers",
+        "productType": "Cisco Catalyst 9800-L-C Wireless Controller"
+      },
+      {
+        "productFamily": "Wireless Controller",
+        "productSeries": "Cisco Catalyst 9800 Series Wireless Controllers",
+        "productType": "Cisco Catalyst 9800-40 Wireless Controller"
+      },
+      {
+        "productFamily": "Wireless Controller",
+        "productSeries": "Cisco Catalyst 9800 Series Wireless Controllers",
+        "productType": "Cisco Catalyst 9800-80 Wireless Controller"
+      }
+    ],
+    "softwareType": "IOS",
+    "softwareVariant": "XE",
+    "templateContent": "{% SET SITE_CODE_LIST = SITE_CODE %}\n{% SET DESCRIPTION_LIST = DESCRIPTION %}\n\n{% FOR ITEM in SITE_CODE_LIST %}\n{% SET SITE = SITE_CODE_LIST[loop.index-1] %}\n{% SET DESCRIPTION = DESCRIPTION_LIST[loop.index-1] %}\n\nwireless profile flex FP_{{SITE}}\n acl-policy CAPTIVE_PORTAL_REDIRECT\n  central-webauth\n no arp-caching\n no local-auth ap radius\n native-vlan-id 2\n vlan-name data\n  acl Flex_Profile_Allow_All\n  vlan-id 10\n vlan-name byod\n  acl Flex_Profile_Allow_All\n  vlan-id 20\n vlan-name guest\n  acl Flex_Profile_Allow_All\n  vlan-id 30\n\nwireless tag site ST_{{SITE}}\n ap-profile MyApProfile\n description {{DESCRIPTION}}\n no local-site\n flex-profile FP_{{SITE}}\n{% ENDFOR %}",
+    "rollbackTemplateContent": "",
+    "templateParams": [
+      {
+        "parameterName": "DESCRIPTION",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 2,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": ""
+      },
+      {
+        "parameterName": "SITE",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 3,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": ""
+      },
+      {
+        "parameterName": "SITE_CODE",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 1,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": ""
+      }
+    ],
+    "rollbackTemplateParams": [],
+    "composite": false,
+    "containingTemplates": [],
+    "language": "JINJA",
+    "promotedTemplateContent": "{% SET SITE_CODE_LIST = SITE_CODE %}\n{% SET DESCRIPTION_LIST = DESCRIPTION %}\n\n{% FOR ITEM in SITE_CODE_LIST %}\n{% SET SITE = SITE_CODE_LIST[loop.index-1] %}\n{% SET DESCRIPTION = DESCRIPTION_LIST[loop.index-1] %}\n\nwireless profile flex FP_{{SITE}}\n acl-policy CAPTIVE_PORTAL_REDIRECT\n  central-webauth\n no arp-caching\n no local-auth ap radius\n native-vlan-id 2\n vlan-name data\n  acl Flex_Profile_Allow_All\n  vlan-id 10\n vlan-name byod\n  acl Flex_Profile_Allow_All\n  vlan-id 20\n vlan-name guest\n  acl Flex_Profile_Allow_All\n  vlan-id 30\n\nwireless tag site ST_{{SITE}}\n ap-profile MyApProfile\n description {{DESCRIPTION}}\n no local-site\n flex-profile FP_{{SITE}}\n{% ENDFOR %}",
+    "promotedTemplateParams": [
+      {
+        "parameterName": "SITE",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 3,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": "",
+        "id": null
+      },
+      {
+        "parameterName": "SITE_CODE",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 1,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": "",
+        "id": null
+      },
+      {
+        "parameterName": "DESCRIPTION",
+        "dataType": "STRING",
+        "defaultValue": null,
+        "description": null,
+        "required": true,
+        "notParam": false,
+        "paramArray": false,
+        "displayName": null,
+        "instructionText": null,
+        "group": null,
+        "order": 2,
+        "customOrder": 0,
+        "selection": null,
+        "range": [],
+        "key": null,
+        "provider": null,
+        "binding": "",
+        "id": null
+      }
+    ],
+    "customParamsOrder": false,
+    "createTime": 1611093853778,
+    "lastUpdateTime": 1611095070304,
+    "latestVersionTime": 1611095081640,
+    "validationErrors": {
+      "templateErrors": [],
+      "rollbackTemplateErrors": [],
+      "templateId": "7bbd84b1-76ca-4f5b-8b56-8a8f66458b2e",
+      "templateVersion": null
+    },
+    "projectAssociated": true,
+    "documentDatabase": false
+  }
+]
