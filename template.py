@@ -238,7 +238,7 @@ if __name__ == "__main__":
 
                 if args.preview:
                     preview_template(id, inputParams)
-
+                    sys.exit(0)
             else:
                 inputParams = args.params
             response = execute(id, params, bindings, args.device, inputParams, args.force)
