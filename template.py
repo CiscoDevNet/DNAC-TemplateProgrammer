@@ -43,6 +43,37 @@ def get_template_id(fqtn):
                     id = v['id']
     return id,max
 
+def check_implicit(reqparams, device, params):
+    # TODO:  This just looks for __device and __interface and adds the managed deviceIP to the resourceParms attribute to resolve implict vars
+    # Need to extend this to handle the other use cases
+    #       "type" : "SITE_UUID",   __sitetag
+    #        "type": "MANAGED_AP_LOCATIONS", 
+    #        "type": "SECONDARY_MANAGED_AP_LOCATIONS",
+    #        "type": "POLICY_PROFILES"  __policyprofile
+    # need to get these from the values passed in as params and translate them.  They are a comma sepperated list
+    # 
+    return_resource = False
+    try:
+        req_dict = json.loads(reqparams)
+    except json.decoder.JSONDecodeError as e:
+        sys.exit(f"Invalid params {e.message}")
+
+    for params in req_dict.keys():
+        print(params)
+        if "__device" in params or "__interface" in params:
+            return_resource = True
+            
+    if return_resource == True:
+        resourceParams =  [
+          {
+            "type": "MANAGED_DEVICE_IP",
+            "value": device
+          }
+          ]
+        return resourceParams
+
+    return None
+
 def execute(id, reqparams, bindings, device, params, doForce):
     #parts = deviceParams.split(';')
     #device = parts[0]
@@ -63,6 +94,11 @@ def execute(id, reqparams, bindings, device, params, doForce):
         }
      ]
     }
+
+    # this is for implicit variables, needs to be generalised
+    resource_params = check_implicit(reqparams, device, params)
+    if resource_params is not None:
+        payload['targetInfo'][0]['resourceParams']= resource_params
     print ("payload", json.dumps(payload))
     return deploy_and_wait("dna/intent/api/v1/template-programmer/template/deploy", payload)
 

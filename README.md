@@ -52,8 +52,40 @@ Looking for: Adam/int-vlan
 https://10.66.104.121:443/api/v1/template-programmer/template
 TemplateId: 78742a98-7a8b-435a-a2f8-284a1f940df0 Version: 9
 <SNIP>
-
 ```
+
+## implicit variables
+Templates support implicit variables.  These begin with __ and link into the DNAC database.  The two that are supported in this release are __interface and __device.   You do not need to do anything, except not provide values for these variables as params.
+
+Anything you provide to the __interface variable will be ignored
+```
+./template.py --template adam-jinja/vlan_descr_implicit --device 10.10.3.122 --params  '{"rest" :"adam"}' --force
+Looking for: adam-jinja/vlan_descr_implicit
+https://10.66.104.121:443/dna/intent/api/v1/template-programmer/template
+TemplateId: b6c66923-807c-44e0-85a3-19d12a450753 Version: 7 
+
+https://10.66.104.121:443/dna/intent/api/v1/template-programmer/template/b6c66923-807c-44e0-85a3-19d12a450753
+Showing Template Body:
+{'name': 'vlan_descr_implicit', 'description': '', 'author': 'admin', 'deviceTypes': [{'productFamily': 'Switches and Hubs'}], 'softwareType': 'IOS-XE', 'softwareVariant': 'XE', 'templateContent': '\n{% for interface in __interface %}\n\n{% if "Vlan" in interface.portName %}\ninterface {{interface.portName}} \ndescription Vlan {{interface.portName}} {{__device.hostname}} {{rest}}\n\n{% endif %}\n{% endfor %}\n', 'templateParams': [{'parameterName': '__device', 'dataType': 'STRING', 'defaultValue': None, 'description': None, 'required': True, 'notParam': False, 'paramArray': False, 'instructionText': None, 'group': None, 'order': 2, 'customOrder': 0, 'selection': None, 'range': [], 'key': None, 'provider': None, 'binding': '', 'sensitiveField': False, 'id': 'ca04baeb-5c02-4805-8500-bac50158586f', 'displayName': None}, {'parameterName': '__interface', 'dataType': 'STRING', 'defaultValue': None, 'description': None, 'required': True, 'notParam': False, 'paramArray': True, 'instructionText': None, 'group': None, 'order': 1, 'customOrder': 0, 'selection': {'selectionType': 'MULTI_SELECT', 'selectionValues': {}, 'defaultSelectedValues': [], 'id': 'e290ecb2-42e4-4872-8198-461272609c26'}, 'range': [], 'key': None, 'provider': None, 'binding': '', 'sensitiveField': False, 'id': '495772d2-0c49-4b9e-b686-c07cdea55df7', 'displayName': None}, {'parameterName': 'rest', 'dataType': 'STRING', 'defaultValue': None, 'description': None, 'required': True, 'notParam': False, 'paramArray': False, 'instructionText': None, 'group': None, 'order': 3, 'customOrder': 0, 'selection': None, 'range': [], 'key': None, 'provider': None, 'binding': '', 'sensitiveField': False, 'id': '0493d96a-403f-41e5-8d2d-e95b0f9d639a', 'displayName': None}], 'rollbackTemplateParams': [], 'composite': False, 'containingTemplates': [], 'language': 'JINJA', 'id': 'b6c66923-807c-44e0-85a3-19d12a450753', 'version': '7', 'customParamsOrder': False, 'createTime': 1709797582624, 'lastUpdateTime': 1711331664338, 'latestVersionTime': 1711331674169, 'projectName': 'adam-jinja', 'projectId': 'ad68c3b6-f7b1-4fe6-9b4c-51a6e10ddd69', 'parentTemplateId': 'fb7dd671-0fb4-4d07-ab07-39346d4bc674', 'validationErrors': {'templateErrors': [{'type': 'POTENTIAL_CONFLICT', 'lineNumber': 5, 'message': 'This command is reserved to be used by Cisco DNA Center'}, {'type': 'POTENTIAL_CONFLICT', 'lineNumber': 4, 'message': 'This command is reserved to be used by Cisco DNA Center'}], 'rollbackTemplateErrors': [], 'templateId': 'b6c66923-807c-44e0-85a3-19d12a450753', 'templateVersion': None}, 'noOfConflicts': 2, 'projectAssociated': True, 'documentDatabase': False}
+
+{% for interface in __interface %}
+
+{% if "Vlan" in interface.portName %}
+interface {{interface.portName}} 
+description Vlan {{interface.portName}} {{__device.hostname}} {{rest}}
+
+{% endif %}
+{% endfor %}
+
+
+Required Parameters for template body: {"__device":"","__interface":"","rest":""}
+
+Bindings []
+
+Executing template on:10.10.3.122, with Params:{"rest" :"adam"}
+```
+
+
 ## force a template to be "reapplied"
 If a template is re-applied with the same parameters, then an error is returned as DNAC will not reapply the same template 
 by default.
